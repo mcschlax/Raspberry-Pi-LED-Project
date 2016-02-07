@@ -145,7 +145,7 @@ def startAlarm(duration):
     #red light will flash once every second
     r_frequency = (2 * math.pi)/(length/duration)
     
-    for i in range(0, length)
+    for i in range(0, length):
         if not alarm_state:
             break
         r = math.sin(r_frequency*i) * (light_flux + light_brightness)
@@ -314,11 +314,13 @@ def saveConfig():
 def runInput():
     global program_state
     global light_state
-    global alarm_state
     global light_duration
     global light_cycles
     global light_brightness
     global light_flux
+    global alarm_state
+    global alarm_start
+    global alarm_end
     
     while program_state:
         user_input = input(">>").split(" ")
@@ -393,8 +395,8 @@ def runInput():
             elif option == "help":
                 print ("Will start lights or alarm")
                 print ("Options:")
-                print ("\trainbow\n\t\tWill start the rainbow with set period (seconds)")
-                print ("\tclock\n\t\tWill start the clock with set (start, end) time")
+                print ("\tlight\n\t\tWill start the light with set period (seconds)")
+                print ("\talarm\n\t\tWill start the alarm with set (start, end) time")
             else:
                 print ("Invalid option please see start help")
 
@@ -414,10 +416,10 @@ def runInput():
                     print ("Invalid alarm already off, see overview for status")
             #help option
             elif option == "help":
-                print ("Will stop rainbow or clock")
+                print ("Will stop lights or alarm")
                 print ("Options:")
-                print ("\trainbow\n\t\tWill stop the rainbow")
-                print ("\tclock\n\t\tWill stop the clock")
+                print ("\tlight\n\t\tWill stop the lights")
+                print ("\talarm\n\t\tWill stop the alarm")
             else:
                 print ("Invalid option please see stop help")
 
@@ -427,10 +429,12 @@ def runInput():
             if option == "light":
                 if len(values) == 1:
                     valid = False
+		    #Input cna be in time format
+		    new_end_time = checkValidTime(values[0])
                     if checkDuration(values[0]):
                         new_duration = int(values[0])
                         valid = True
-                    elif new_end_time = checkValidTime(values[0]):
+                    elif new_end_time:
                         new_duration = calculateDifference(new_end_time)
                         valid = new_duration > 0
                     if valid:
@@ -438,73 +442,68 @@ def runInput():
                         if light_state:
                             light_state = False
                             time.sleep(sleep_delay)
-                        light_duration = int(new_duration)
+                        light_duration = new_duration
                         light_state = True
                         print ("Light's duration changed to: " + str(light_duration))
                     else:
-                        print ("Invalid value for light duration, duration must be greater than 0")
+                        print ("Invalid value for light duration please see change help")
                 else:
-                    print ("Invalid number of values for start rainbow please see change help")
+                    print ("Invalid number of values for change light please see change help")
             #alarm option
             elif option == "alarm":
                 if len(values) == 2:
-                    start_time = values[0].split(":")
-                    end_time = values[1].split(":")
-                    
-                    valid_syntax = True #True until proven False
-                    if len(start_time) != 2:
-                        print ("Invalid syntax for start clock start time, see change help")
-                        valid_syntax = False
-                    if len(end_time) != 2:
-                        print ("Invalid syntax for start clock end time, see change help")
-                        valid_syntax = False;
-
-                    if valid_syntax:
-                        print (checkValidClock(start_time[0], start_time[1], end_time[0], end_time[1]))
+		    valid = True
+                    if not checkValidTime(values[0]):
+			print ("Invalid start time for change alarm please see change help")
+			valid = False
+		    if checkValidTime(values[1]):
+			print ("Invalid end time for change alarm please see change help")
+			valid = False
+		    if valid:
+			alarm_start = values[0]
+			alarm_end = values[1]
+			print (showAlarm())
                 else:
-                    print ("Invalid number of values for change clock please see start help")
+                    print ("Invalid number of values for change alarm please see alarm help")
             #brightness option
-            if option == options[4]:
+            if option == "brightness":
                 if len(values) == 1:
-                    new_brightness = light_brightness
-                    try:
-                        new_brightness = (int)(values[0])
-                    except:
-                        pass
-                    light_brightness = checkBrightness(new_brightness)
+		    if checkBrightness(values[0]):
+			light_brightness = int(values[0])
+		    else:
+			print ("Invalid value for change brightness please see change help")
                 else:
                     print ("Invalid number of values for change brightness please see change help")
             #flux option
-            elif option == options[5]:
+            elif option == "flux":
                 if len(values) == 1:
-                    new_flux = light_flux
-                    try:
-                        new_flux = (int)(values[0])
-                    except:
-                        pass
-                    light_flux = checkBrightness(new_flux)
+		    if checkFlux(values[0]):
+			light_flux = int(values[0])
+		    else:
+			print ("Invalid value for change brightness please see change help")
                 else:
                     print ("Invalid number of values for change brightness please see change help")
             #help option
-            elif option == options[0]:
-                print ("Will change rainbow period, clock (start, end) time, brightness, flux")
+            elif option == "help":
+                print ("Will change light duration, alarm (start, end) time, brightness, flux")
                 print ("Options:")
-                print ("\trainbow <period>\n\t\tWill change the rainbow to the desired period (seconds)")
-                print ("\tclock <start hour>:<start minute> <end hour>:<end minute>\n\t\tWill start the clock after setting it to desired (start, end) time")
-                print ("\brightness <value>\n\t\tWill change the brightness to the desired amount, will be capped at 255 and floored at 0")
-                print ("\flux <value>\n\t\tWill change the brightness fluctuation to the desired amount, will be capped at 255 and floored at 0")
+                print ("\tlight <duration>\n\t\tWill change the light duration to the desired value, must be greater than zero (seconds)")
+                print ("\talarm <start hour>:<start minute> <end hour>:<end minute>\n\t\tWill start the alarm after setting it to desired (start, end) time")
+                print ("\brightness <value>\n\t\tWill change the brightness to the desired value, must be >= 0 and <= 255")
+                print ("\flux <value>\n\t\tWill change the brightness fluctuation to the desired amount, must have brightness - flux >= 0 and brightness + flux <= 
+255")
             else:
                 print ("Invalid option please see change help")
                 
         #save command
-        elif command == commands[4]:
-            will_save = False #False until proven True
+        elif command == "save":
+            will_save = False
 
             #no option
             if not option:
-                will_save = True #no option, will save
+                will_save = True
             #help option
-            elif option == options[0]:
+            elif option == "help":
                 print ("Will save program's values")
                 print ("Options:")
                 print ("\t\n\t\tWill save the program's values listed in overview to LED_Main.ini")
@@ -521,7 +520,7 @@ def runInput():
             will_load = not option
             
             #help option
-            if option == options[0]:
+            if option == "help":
                 print ("Will load program's values")
                 print ("Options:")
                 print ("\t\n\t\tWill load the program's values listed in overview from LED_Main.ini")
@@ -535,7 +534,7 @@ def runInput():
             print ("Program State: " + str(program_state))
             print ("Light State: " + str(light_state))
             print ("Alarm State: " + str(alarm_state))
-            print (showClock())
+            print (showAlarm())
             print ("Light Duration: " + str(light_duration))
             print ("Light Cycles: " + str(light_cycles))
             print ("Light Brightness: " + str(light_brightness))
@@ -589,7 +588,7 @@ if __name__ == "__main__":
     pi = pigpio.pi()
 
     loadConfig()
-    start_new_thread(runClock, ()) #third thread for alarm timer
+    start_new_thread(runAlarm, ()) #third thread for alarm timer
     start_new_thread(runLight, ()) #second thread for light display
     runInput() #main thread checks input
          
