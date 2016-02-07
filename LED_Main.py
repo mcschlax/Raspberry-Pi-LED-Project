@@ -429,8 +429,8 @@ def runInput():
             if option == "light":
                 if len(values) == 1:
                     valid = False
-		    #Input cna be in time format
-		    new_end_time = checkValidTime(values[0])
+                    #Input cna be in time format
+                    new_end_time = checkValidTime(values[0])
                     if checkDuration(values[0]):
                         new_duration = int(values[0])
                         valid = True
@@ -452,35 +452,35 @@ def runInput():
             #alarm option
             elif option == "alarm":
                 if len(values) == 2:
-		    valid = True
+                    valid = True
                     if not checkValidTime(values[0]):
-			print ("Invalid start time for change alarm please see change help")
-			valid = False
-		    if checkValidTime(values[1]):
-			print ("Invalid end time for change alarm please see change help")
-			valid = False
-		    if valid:
-			alarm_start = values[0]
-			alarm_end = values[1]
-			print (showAlarm())
+                        print ("Invalid start time for change alarm please see change help")
+                        valid = False
+                    if checkValidTime(values[1]):
+                        print ("Invalid end time for change alarm please see change help")
+                        valid = False
+                    if valid:
+                        alarm_start = values[0]
+                        alarm_end = values[1]
+                        print (showAlarm())
                 else:
                     print ("Invalid number of values for change alarm please see alarm help")
             #brightness option
             if option == "brightness":
                 if len(values) == 1:
-		    if checkBrightness(values[0]):
-			light_brightness = int(values[0])
-		    else:
-			print ("Invalid value for change brightness please see change help")
+                    if checkBrightness(values[0]):
+                        light_brightness = int(values[0])
+                    else:
+                        print ("Invalid value for change brightness please see change help")
                 else:
                     print ("Invalid number of values for change brightness please see change help")
             #flux option
             elif option == "flux":
                 if len(values) == 1:
-		    if checkFlux(values[0]):
-			light_flux = int(values[0])
-		    else:
-			print ("Invalid value for change brightness please see change help")
+                    if checkFlux(values[0]):
+                        light_flux = int(values[0])
+                    else:
+                        print ("Invalid value for change brightness please see change help")
                 else:
                     print ("Invalid number of values for change brightness please see change help")
             #help option
@@ -490,8 +490,7 @@ def runInput():
                 print ("\tlight <duration>\n\t\tWill change the light duration to the desired value, must be greater than zero (seconds)")
                 print ("\talarm <start hour>:<start minute> <end hour>:<end minute>\n\t\tWill start the alarm after setting it to desired (start, end) time")
                 print ("\brightness <value>\n\t\tWill change the brightness to the desired value, must be >= 0 and <= 255")
-                print ("\flux <value>\n\t\tWill change the brightness fluctuation to the desired amount, must have brightness - flux >= 0 and brightness + flux <= 
-255")
+                print ("\flux <value>\n\t\tWill change the brightness fluctuation to the desired amount, must have brightness - flux >= 0 and brightness + flux <= 255")
             else:
                 print ("Invalid option please see change help")
                 
